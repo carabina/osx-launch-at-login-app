@@ -9,25 +9,32 @@
 import Cocoa
 import ServiceManagement
 
+
+extension Notification.Name {
+    static let killme = Notification.Name("killme")
+}
+
+
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate
 {
 
-	func applicationDidFinishLaunching(aNotification: NSNotification) {
+	func applicationDidFinishLaunching(_ aNotification: Notification) {
 		let launcherAppIdentifier = "com.tiborbodecs.LauncherApplication"
 
 		//you should move this next line to somewhere else this is for testing purposes only!!!
-		SMLoginItemSetEnabled(launcherAppIdentifier, true)
+		SMLoginItemSetEnabled(launcherAppIdentifier as CFString, true)
 		
 		var startedAtLogin = false
-		for app in NSWorkspace.sharedWorkspace().runningApplications {
+		for app in NSWorkspace.shared().runningApplications {
 			if app.bundleIdentifier == launcherAppIdentifier {
 				startedAtLogin = true
 			}
 		}
 
 		if startedAtLogin {
-			NSDistributedNotificationCenter.defaultCenter().postNotificationName("killme", object: NSBundle.mainBundle().bundleIdentifier!)
+			DistributedNotificationCenter.default().post(name: .killme, object: Bundle.main.bundleIdentifier!)
 //			NSLog("i killed the launcher app!")
 		}
 	}
